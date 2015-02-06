@@ -108,7 +108,7 @@ def is_number(token):
 def is_function(token):
    '''Returns if the token is one of the defined functions'''
    for function in FUNCTIONS:
-      if function in token:
+      if function + '(' in token:
          return True
    return False
 
