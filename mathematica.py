@@ -133,8 +133,8 @@ def calculate_postfix_notation(postfix_notation_tokens):
       if is_number(token):
          numbers.append(float(token))
       if is_operator(token):
-         num1 = numbers.pop()
          num2 = numbers.pop()
+         num1 = numbers.pop()
          if token == '+':
             numbers.append(num1 + num2)
          elif token == '-':
