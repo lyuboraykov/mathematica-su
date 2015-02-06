@@ -147,16 +147,32 @@ def get_token_without_function(token, function):
    token = replace_last(token, ')', '')
    return token
 
+def split_function_arguments(function_arguments_string):
+   '''
+   Returns the splitted arguments of a function.
+   Works only with two arguments.
+   '''
+   open_parantheses_count = 0
+   for i, character in enumerate(function_arguments_string):
+      if character == ',' and open_parantheses_count == 0:
+         arg1 = function_arguments_string[:i]
+         arg2 = function_arguments_string[i + 1:]
+         return arg1, arg2
+      if character == '(':
+         open_parantheses_count += 1
+      if character == ')':
+         open_parantheses_count -= 1
+   return '',''
+
 def calculate_function(token):
-   # FUNCTIONS = ['log', 'pow', 'sin', 'cos', 'tg', 'cotg', 'sqrt']
    if token[:3] == 'log':
       token = get_token_without_function(token, 'log')
       return math.log(calculate_expression(token))
    if token[:3] == 'pow':
       token = get_token_without_function(token, 'pow')
-      args = token.split(',')
-      base = calculate_postfix_notation(args[0].strip())
-      power = calculate_postfix_notation(args[1].strip())
+      arg1, arg2 = split_function_arguments(token)
+      base = calculate_expression(arg1.strip())
+      power = calculate_expression(arg2.strip())
       return math.pow(base, power)
    if token[:3] == 'sin':
       token = get_token_without_function(token, 'sin')
