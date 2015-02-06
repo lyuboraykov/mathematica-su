@@ -7,6 +7,7 @@ import math
 from collections import deque
 
 class Operator:
+   '''A simple class for operator precedence correlation'''
    def __init__(self, sign, precedence):
       self.sign = sign
       self.precedence = precedence
@@ -19,7 +20,7 @@ CONSTANTS = {
 }
 
 def calculate_expression(expression):
-   '''Calculates infix notation'''
+   '''Calculates infix notation string.'''
    infix_tokens = get_tokens_from_infix_notation(expression)
    postfix_notation_tokens = convert_to_postfix_notation(infix_tokens)
    return calculate_postfix_notation(postfix_notation_tokens)
@@ -97,6 +98,7 @@ def convert_to_postfix_notation(infix_tokens):
    return list(outputQueue)
 
 def is_number(token):
+   '''Returns if the token can be parsed to a float'''
    try:
       float(token)
       return True
@@ -104,21 +106,28 @@ def is_number(token):
       return False
 
 def is_function(token):
+   '''Returns if the token is one of the defined functions'''
    for function in FUNCTIONS:
       if function in token:
          return True
    return False
 
 def is_operator(token):
+   '''Returns if the token is one of the defined operators'''
    return token in [operator.sign for operator in OPERATORS]
 
 def get_operator_precedence_by_sign(sign):
+   '''Returns the precedence of the sign by its value'''
    for operator in OPERATORS:
       if operator.sign == sign:
          return operator.precedence
    return 0
 
 def calculate_postfix_notation(postfix_notation_tokens):
+   '''
+   Calculates the postfix notation result.
+   postfix_notation_tokens - list of the tokens in a postfix order
+   '''
    numbers = []
    for token in postfix_notation_tokens:
       if is_number(token):
@@ -142,7 +151,11 @@ def replace_last(string, old, new):
    '''Replaces the last occurence of text in a string'''
    return string[::-1].replace(old, new, 1)[::-1]
 
-def get_token_without_function(token, function):
+def get_function_arguments(token, function):
+   '''
+   Removes the outer-most function part in a token.
+   e.g. if its log(pow(2,2) + 17) will return pow(2,2) + 17
+   '''
    token = token.replace(function + '(', '', 1)
    token = replace_last(token, ')', '')
    return token
@@ -165,29 +178,30 @@ def split_function_arguments(function_arguments_string):
    return '',''
 
 def calculate_function(token):
+   '''Calculates the value of a function token'''
    if token[:3] == 'log':
-      token = get_token_without_function(token, 'log')
+      token = get_function_arguments(token, 'log')
       return math.log(calculate_expression(token))
    if token[:3] == 'pow':
-      token = get_token_without_function(token, 'pow')
+      token = get_function_arguments(token, 'pow')
       arg1, arg2 = split_function_arguments(token)
       base = calculate_expression(arg1.strip())
       power = calculate_expression(arg2.strip())
       return math.pow(base, power)
    if token[:3] == 'sin':
-      token = get_token_without_function(token, 'sin')
+      token = get_function_arguments(token, 'sin')
       return math.sin(calculate_expression(token))
    if token[:3] == 'cos':
-      token = get_token_without_function(token, 'cos')
+      token = get_function_arguments(token, 'cos')
       return math.cos(calculate_expression(token))
    if token[:2] == 'tg':
-      token = get_token_without_function(token, 'tg')
+      token = get_function_arguments(token, 'tg')
       return math.tan(calculate_expression(token))
    if token[:4] == 'cotg':
-      token = get_token_without_function(token, 'cotg')
+      token = get_function_arguments(token, 'cotg')
       return 1 / math.tan(calculate_expression(token))
    if token[:4] == 'sqrt':
-      token = get_token_without_function(token, 'sqrt')
+      token = get_function_arguments(token, 'sqrt')
       return math.pow(calculate_expression(token), 0.5)
 
 if __name__ == '__main__':
